@@ -69,7 +69,6 @@ def main():
 		start_moment = datetime.now()
 
 		for (schoolName,schoolFile) in collegeFiles.items() :
-
 			coordlocation = collegeLocations[schoolName] #keep track of the locations & don't use the API
 			remoteyakker.update_location(coordlocation)
 			currentlist = remoteyakker.get_yaks()
@@ -134,6 +133,7 @@ def read(yaklist,outFile, times):
 		# if (timeDiff.month ==0 and timeDiff.day ==0 and
 		# 	((timeDiff.hour <1 and timeDiff.minute >=55) or (timeDiff.hour ==1 and timeDiff.minute <=5))):
 		if (timeDiff < mostTime and timeDiff > leastTime):
+			print (schoolName)
 			# line between yaks
 			outFile.write("_" * 93)
 			# show yak
