@@ -125,7 +125,7 @@ def read(yaklist,outFile, times):
 	yakNum = 1
 	for yak in yaklist:
 		
-		now = datetime.now() + timedelta(hours=3)
+		now = datetime.now()
 		yakTime = datetime.strptime(yak.time, "%Y-%m-%d %H:%M:%S")
 		timeDiff = now - yakTime
 		leastTime = timedelta(minutes=start_time)
