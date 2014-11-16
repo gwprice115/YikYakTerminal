@@ -15,3 +15,7 @@ claremontFile.txt
 colgateFile.txt
 columbiaFile.txt
 utahFile.txt
+../../API.pyc
+../../__version__.pyc
+../../pygeocoder.pyc
+../../pygeolib.pyc
