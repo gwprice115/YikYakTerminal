@@ -8,12 +8,10 @@ from time import strftime, gmtime, sleep
 from datetime import datetime, timedelta
 
 def main():
-
-	# Title text
-	print("\nYik Yak Command Line Edition : Created by djtech42\n\n")
 	
 	# Initialize Google Geocoder API
-	geocoder = pygeocoder.Geocoder("AIzaSyAGeW6l17ATMZiNTRExwvfa2iuPA1DvJqM")
+	geocoder = pygeocoder.Geocoder("AIzaSyB3X2bU_oHFuiYUpcHog_jQhaR-zN-3cmE")
+
 	
 	try:
 		# If location already set in past, read file
@@ -79,8 +77,16 @@ def main():
 	# When actions are completed, user can execute another action or quit the app
 	# colleges = ["Columbia University","Claremont Colleges","Georgia Southern University","Texas A&M","Clemson University","Wake Forest University","Stanford University","Colgate University","University of Utah"]
 	collegeFiles = {"Columbia University":"columbiaFile.txt","Claremont Colleges":"claremontFile.txt","Georgia Southern University":"georgiaFile.txt","Texas A&M":"texasFile.txt","Clemson University":"clemsonFile.txt","Wake Forest University":"wakeFile.txt","Stanford University":"stanfordFile.txt","Colgate University":"colgateFile.txt","University of Utah":"utahFile.txt"}
-	timeRadius = 5
+	timeRadius = 0#5
 	timesToCollect = {"1hour":(60-timeRadius,60+timeRadius),"2hour":(120-timeRadius,120+timeRadius),"3hour":(180-timeRadius,180+timeRadius),"4hour":(240-timeRadius,240+timeRadius)}
+	collegeLocations = {}
+	for college in collegeFiles.keys():
+		try:
+			collegeLocations[college] = newLocation(geocoder, college)
+			print("setting"+college)
+		except: 
+			print("Google Geolocation API isn't working for "+college+" for some reason.")
+
 	start_moment = datetime.now()-timedelta(minutes = timeRadius * 2)
 	while True:
 		end_moment = datetime.now()
@@ -102,7 +108,8 @@ def main():
 
 		for (schoolName,schoolFile) in collegeFiles.items() :
 
-			coordlocation = changeLocation(geocoder, schoolName)
+			# coordlocation = changeLocation(geocoder, schoolName)
+			coordlocation = collegeLocations[schoolName]
 			remoteyakker.update_location(coordlocation)
 			currentlist = remoteyakker.get_yaks()
 
@@ -150,6 +157,7 @@ def main():
 			
 def newLocation(geocoder, address=""):
 	# figure out location latitude and longitude based on address
+	print("new location"+address)
 	if len(address) == 0:
 		address = input("Enter college name or address: ")
 	try:
