@@ -133,7 +133,7 @@ def read(yaklist,outFile, times):
 		# if (timeDiff.month ==0 and timeDiff.day ==0 and
 		# 	((timeDiff.hour <1 and timeDiff.minute >=55) or (timeDiff.hour ==1 and timeDiff.minute <=5))):
 		if (timeDiff < mostTime and timeDiff > leastTime):
-			print (schoolName)
+			print (outFile)
 			# line between yaks
 			outFile.write("_" * 93)
 			# show yak
