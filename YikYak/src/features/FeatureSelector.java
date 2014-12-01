@@ -67,11 +67,9 @@ public class FeatureSelector {
 						}
 						yakText = reader.readLine();
 						//add words to vocab
-						String[] words = yakText.toLowerCase().split("\\s");
-						for (String word: words){
-							for (String subWord: getWords(word)){
-								addToVocab(subWord);
-							}
+						
+						for (String word: getWords(yakText)){
+							addToVocab(word);
 						}
 						likeLine = reader.readLine();
 						try{
@@ -112,31 +110,82 @@ public class FeatureSelector {
 			PrintWriter typeW = new PrintWriter(new FileWriter(features)); //types of features we're using
 			PrintWriter featureW = new PrintWriter(new FileWriter(outputFeatures)); //features of cases
 			PrintWriter labelW = new PrintWriter(new FileWriter(outputLabels)); //labels of cases
-			for (Yak yak: yaks){
-				//TODO: currently working on this.
+			//print the types of features, IN ORDER. SUPER IMPORTANT THAT THEY'RE IN ORDER
+			typeW.println("header exists?");
+			typeW.println("length: words");
+			typeW.println("length: chars");
+			typeW.println("unique words");
+			typeW.println("capitals");
+			for (String word: vocabulary){
+				typeW.println("unigram:"+word);
 			}
+			for (String word1: vocabulary){
+				for (String word2: vocabulary){
+					typeW.println("bigram:"+word1+"++"+word2);
+				}
+			}
+			for (Yak yak: yaks){
+				//header?
+				featureW.print(yak.hasHeader()+" ");
+				//length (words)
+				featureW.print(getWords(yak.yak).size()+" ");
+				//length (characters)
+				featureW.print(yak.yak.length()+" ");
+				//unique words
+				featureW.print(yak.uniqueWords(uniqueVocab)+" ");
+				//num capital letters
+				featureW.print(yak.numCapitalLetters()+" ");
+				//unigrams
+				HashMap<String, Integer> unigrams = yak.getUnigrams();
+				for (String word: vocabulary){
+					if (unigrams.get(word)!=null){
+						featureW.print(unigrams.get(word)+" ");
+					} else {
+						featureW.print(0+" ");
+					}
+				}
+				//bigrams
+				HashMap<String, Integer> bigrams = yak.getUnigrams();
+				for (String word1: vocabulary){
+					for (String word2: vocabulary){
+						String bigram = word1+"++"+word2;
+						if (bigrams.get(bigram)!=null){
+							featureW.print(bigrams.get(bigram)+" ");
+						} else {
+							featureW.print(0+" ");
+						}
+					}
+				}
+				featureW.print("\n");
+				//print label!
+				labelW.println(yak.label);
+			}
+			labelW.close();
+			featureW.close();
+			typeW.close();
 		} catch(IOException e){
 			e.printStackTrace();
 		}
-		
-		//header?
-		//length (words)
-		//length (characters)
-		//unigrams (including UNIQUE_count)
-		//bigrams
-
 	}
 	
-	private List<String> getWords(String word){
+	//gets words, in order.
+	public static List<String> getWords(String text){
+		String[] words = text.toLowerCase().split("\\s");
 		List<String> result = new ArrayList<String>();
-		while (word.matches(".+[.,!?\"'&/)#-:]")){
-			result.add(word.substring(word.length()-1));
-			word = word.substring(0, word.length()-1);
-		} while (word.matches("[.,!?\"'&/(#:-].+")){
-			result.add(word.substring(0,1));
-			word = word.substring(1, word.length());
+		for (int i = 0; i < words.length; i++){
+			String word = words[i];
+			while (word.matches("[.,!?\"'&/(#:-].+")){
+				result.add(word.substring(0,1));
+				word = word.substring(1, word.length());
+			}
+			List<String> afterWords = new ArrayList<String>();
+			while (word.matches(".+[.,!?\"'&/)#-:]")){
+				afterWords.add(0,word.substring(word.length()-1));
+				word = word.substring(0, word.length()-1);
+			}
+			result.add(word);
+			result.addAll(afterWords);
 		}
-		result.add(word);
 		return result;
 	}
 	
@@ -152,9 +201,10 @@ public class FeatureSelector {
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		List<String> inputFiles = new ArrayList<String>();
-		inputFiles.add("4claremontFile.txt");
-		new FeatureSelector(inputFiles);
-
+		inputFiles.add("1claremontFile.txt");
+		
+		FeatureSelector f = new FeatureSelector(inputFiles);
+		f.printFeatures("features", "labels", "types");
 	}
 
 }

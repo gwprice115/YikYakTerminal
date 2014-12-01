@@ -1,6 +1,8 @@
 package features;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 public class Yak {
 	public double postTime;
@@ -8,6 +10,7 @@ public class Yak {
 	public int label;
 	public int commentNum;
 	public String yak;
+	public List<String> yakWords;
 	public String header;
 	public int postDate, hour;
 
@@ -24,6 +27,7 @@ public class Yak {
 		this.yak = yak;
 		this.header = header;
 		this.hour = hour;
+		yakWords = FeatureSelector.getWords(yak);
 	}
 	
 	public enum School {
@@ -38,15 +42,46 @@ public class Yak {
 		}
 	}
 	
-	public boolean hasHeader(){
-		return header!=null;
+	public int hasHeader(){
+		return header==null? 0: 1;
 	}
 	
-//	public HashMap<String, Integer> getUnigrams(){
-//		
-//	}
-//	public HashMap<String, Integer> getBigrams(){
-//		
-//	}
+	public int uniqueWords(Set<String> uniqVocab){
+		int result = 0;
+		for (String word: yakWords){
+			if (uniqVocab.contains(word)){
+				result++;
+			}
+		}
+		return result;
+	}
+	
+	public HashMap<String, Integer> getUnigrams(){
+		HashMap<String, Integer> result = new HashMap<String, Integer>();
+		for (String word: yakWords){
+			int count = result.get(word)!=null ? result.get(word) : 0;
+			result.put(word, count+1);
+		}
+		return result;
+	}
+	public HashMap<String, Integer> getBigrams(){
+		HashMap<String, Integer> result = new HashMap<String, Integer>();
+		for (int i= 0; i < yakWords.size()-1; i++){
+			String bigram = yakWords.get(i)+"++"+yakWords.get(i+1);
+			int count = result.get(bigram)==null ? 0: result.get(bigram);
+			result.put(bigram, count+1);
+		}
+		return result;
+	}
+	
+	public int numCapitalLetters(){
+		int result = 0;
+		for (int i = 0; i < yak.length(); i++){
+			if (Character.isUpperCase(yak.charAt(i))){
+				result+=1;
+			}
+		}
+		return result;
+	}
 
 }
