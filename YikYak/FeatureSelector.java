@@ -32,6 +32,11 @@ public class FeatureSelector {
 	protected Set<String> uniqueVocab;
 	protected Map<String, Integer> dictionaryMap;
 
+	/**
+	 * for training
+	 * and creating external dictionary file
+	 * @param inputFiles
+	 */
 	public FeatureSelector(List<String> inputFiles) {
 		vocabulary = new HashSet<String>();
 //		yaks = new ArrayList<Yak>();
@@ -41,6 +46,12 @@ public class FeatureSelector {
 		secondPass(inputFiles, true);
 	}
 	
+	/**
+	 * for testing
+	 * requires eternal dictionary file
+	 * @param testFiles
+	 * @param dictionaryFile
+	 */
 	public FeatureSelector(List<String> testFiles, String dictionaryFile){
 		vocabulary = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
@@ -48,6 +59,11 @@ public class FeatureSelector {
 		secondPass(testFiles, false);
 	}
 	
+	/**
+	 * used to read in the dictionary from external file and save in 
+	 * dictionaryMap of String (unigram or bigram) to feature index
+	 * @param dictionaryFile
+	 */
 	private void readDictionary(String dictionaryFile){
 		//read in vocab
 		String wordEntry;
@@ -67,6 +83,13 @@ public class FeatureSelector {
 		}
 	}
 	
+	/**
+	 * FirstPass is only called on training. 
+	 * It iterates through all Yaks in all files and stores all unigrams and bigrams in a 
+	 * dictionaryMap of String to feature index.
+	 * It then writes this out to a file. 
+	 * @param inputFiles
+	 */
 	private void firstPass(List<String> inputFiles) {
 		try {
 			BufferedReader reader;
@@ -117,19 +140,53 @@ public class FeatureSelector {
 		}
 	}
 
+	/**
+	 * for a single yak,
+	 * appropriately parses and stores all unigrams and bigrams
+	 * @param yakText
+	 */
 	private void parseWordsFirstPass(String yakText) {
 		List<String> yakWords = getWords(yakText);
+		//unigrams
 		for (String word: yakWords){
 			addToVocab(word);
 		}
-		int size = dictionaryMap.size();
+		//bigrams
 		for(int i = 0; i<yakWords.size()-1;i++){
-			dictionaryMap.put(yakWords.get(i)+" "+yakWords.get(i+1), size+1);
-			size++;
+			int size = dictionaryMap.size();
+
+			String bigram = yakWords.get(i)+" "+yakWords.get(i+1);
+
+			if(!dictionaryMap.containsKey(bigram)){
+				dictionaryMap.put(yakWords.get(i)+" "+yakWords.get(i+1), size+1);		
+			}
 		}
 	}
 	
-
+	/**
+	 * used for storing unigrams
+	 * always adds to vocabulary
+	 * only adds to uniqueVocab and dictionaryMap if this is the first time we're seeing it
+	 * appropriately removes from uniqueVocab if we're seeing a word we've seen already
+	 * @param word
+	 */
+	private void addToVocab(String word){
+		//since is set, add(word) returns true if successfully added, false if already there
+		if (vocabulary.add(word)){
+			uniqueVocab.add(word);
+			dictionaryMap.put(word, dictionaryMap.size()+1);
+		} else {
+			uniqueVocab.remove(word); //not actually unique, because already in set of vocab
+		}
+	}
+	
+	/**
+	 * secondPass is called in both training or testing, with a boolean parameter to specify which
+	 * in training, the actual like numbers are written out to the files with the feature vector
+	 * in testing, a 0 is written out as the score with the feature vector, and a separate file is created of the actual likes received
+	 * @param inputFiles
+	 * @param train
+	 */
 	private void secondPass(List<String> inputFiles, boolean train) {
 		try {
 			BufferedReader reader;
@@ -180,9 +237,7 @@ public class FeatureSelector {
 						}
 						
 						
-						//SHANNON WORKING ON THIS
 						//this method reads the next line, which should be the Yak,
-						//and stores the vocab correctly
 						yakText = reader.readLine();
 						HashMap<String,Integer> bagOfWords = new HashMap<String,Integer>();
 						List<String> yakWords = getWords(yakText);
@@ -207,7 +262,7 @@ public class FeatureSelector {
 						//bigrams
 						HashMap<String,Integer> bigramBOW = new HashMap<String,Integer>();
 						for (int i= 0; i < yakWords.size()-1; i++){
-							String bigram = yakWords.get(i)+"++"+yakWords.get(i+1);
+							String bigram = yakWords.get(i)+" "+yakWords.get(i+1);
 							int count = bigramBOW.get(bigram)==null ? 0: bigramBOW.get(bigram);
 							bigramBOW.put(bigram, count+1);
 						}
@@ -251,9 +306,6 @@ public class FeatureSelector {
 						throw new RuntimeException("Number of lines of a yikyak isn't what was expected");
 					}
 					
-					
-					
-					//SHANNON WORKING ON THIS
 					//print out features, and likes, for each and every Yak
 					if(train){
 						featureW.print(likes+" ");
@@ -264,9 +316,9 @@ public class FeatureSelector {
 					
 					
 					//unigrams
-					Iterator<Integer> unigramIter = gramFeatureMap.keySet().iterator();
-					while(unigramIter.hasNext()){
-						int featureNum = unigramIter.next();
+					Iterator<Integer> gramIter = gramFeatureMap.keySet().iterator();
+					while(gramIter.hasNext()){
+						int featureNum = gramIter.next();
 						featureW.print(featureNum+":"+gramFeatureMap.get(featureNum)+" ");
 					}
 					
@@ -300,20 +352,6 @@ public class FeatureSelector {
 					//num capital letters
 					featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 					nextIndex++;
-
-					//TODO
-					//bigrams
-//					HashMap<String, Integer> bigrams = yak.getUnigrams();
-//					for (String word1: vocabulary){
-//						for (String word2: vocabulary){
-//							String bigram = word1+"++"+word2;
-//							if (bigrams.get(bigram)!=null){
-//								featureW.print(bigrams.get(bigram)+" ");
-//							} else {
-//								featureW.print(0+" ");
-//							}
-//						}
-//					}
 					featureW.print("\n");
 
 				}
@@ -327,6 +365,12 @@ public class FeatureSelector {
 		
 	}
 	
+	/**
+	 * calculates the number of capital letters in a yak 
+	 * feature for regression
+	 * @param yak
+	 * @return
+	 */
 	private int numCapitalLetters(String yak){
 		int result = 0;
 		for (int i = 0; i < yak.length(); i++){
@@ -336,73 +380,12 @@ public class FeatureSelector {
 		}
 		return result;
 	}
-
 	
-//	//NOT using this right now - SNL
-//	public void printFeatures(String outputFeatures, String outputLabels, String features){
-//		try{
-//			PrintWriter typeW = new PrintWriter(new FileWriter(features)); //types of features we're using
-//			PrintWriter featureW = new PrintWriter(new FileWriter(outputFeatures)); //features of cases
-//			PrintWriter labelW = new PrintWriter(new FileWriter(outputLabels)); //labels of cases
-//			//print the types of features, IN ORDER. SUPER IMPORTANT THAT THEY'RE IN ORDER
-//			typeW.println("header exists?");
-//			typeW.println("length: words");
-//			typeW.println("length: chars");
-//			typeW.println("unique words");
-//			typeW.println("capitals");
-//			for (String word: vocabulary){
-//				typeW.println("unigram:"+word);
-//			}
-//			for (String word1: vocabulary){
-//				for (String word2: vocabulary){
-//					typeW.println("bigram:"+word1+"++"+word2);
-//				}
-//			}
-//			for (Yak yak: yaks){
-//				//header?
-//				featureW.print(yak.hasHeader()+" ");
-//				//length (words)
-//				featureW.print(getWords(yak.yak).size()+" ");
-//				//length (characters)
-//				featureW.print(yak.yak.length()+" ");
-//				//unique words
-//				featureW.print(yak.uniqueWords(uniqueVocab)+" ");
-//				//num capital letters
-//				featureW.print(yak.numCapitalLetters()+" ");
-//				//unigrams
-//				HashMap<String, Integer> unigrams = yak.getUnigrams();
-//				for (String word: vocabulary){
-//					if (unigrams.get(word)!=null){
-//						featureW.print(unigrams.get(word)+" ");
-//					} else {
-//						featureW.print(0+" ");
-//					}
-//				}
-//				//bigrams
-//				HashMap<String, Integer> bigrams = yak.getUnigrams();
-//				for (String word1: vocabulary){
-//					for (String word2: vocabulary){
-//						String bigram = word1+"++"+word2;
-//						if (bigrams.get(bigram)!=null){
-//							featureW.print(bigrams.get(bigram)+" ");
-//						} else {
-//							featureW.print(0+" ");
-//						}
-//					}
-//				}
-//				featureW.print("\n");
-//				//print label!
-//				labelW.println(yak.label);
-//			}
-//			labelW.close();
-//			featureW.close();
-//			typeW.close();
-//		} catch(IOException e){
-//			e.printStackTrace();
-//		}
-//	}
-	
-	//gets words, in order.
+	/**
+	 * returns a List of strings that are the items in the YikYak, split on whitespace
+	 * @param text
+	 * @return
+	 */
 	public static List<String> getWords(String text){
 		text = text.trim(); //eliminate trailing whitespace (which for some reason was being seen as its own word
 		String[] words = text.toLowerCase().split("\\s+");
@@ -424,18 +407,10 @@ public class FeatureSelector {
 		return result;
 	}
 	
-	private void addToVocab(String word){
-		//since is set, add(word) returns true if successfully added, false if already there
-		if (vocabulary.add(word)){
-			uniqueVocab.add(word);
-			dictionaryMap.put(word, dictionaryMap.size()+1);
-		} else {
-			uniqueVocab.remove(word); //not actually unique, because already in set of vocab
-		}
-	}
-	
-	
-	//enum for school
+	/**
+	 * enum for school
+	 * use as feature
+	 */
 	public enum School {
 		COLUMBIA, CLAREMONT, GEORGIA, TEXAS, CLEMSON, WAKE, STANFORD, COLGATE, UTAH;
 		public static School getSchool(String s){
@@ -471,9 +446,10 @@ public class FeatureSelector {
 		inputFiles.add("4stanfordFile.txt");
 		List<String> testFiles = new ArrayList<String>();
 		testFiles.add("4claremontFile.txt");
+		testFiles.add("4stanfordFile.txt");
 		
 		FeatureSelector f = new FeatureSelector(inputFiles);
-//		FeatureSelector test = new FeatureSelector(testFiles, "dictionary.txt");
+		FeatureSelector test = new FeatureSelector(testFiles, "dictionary.txt");
 		
 	}
 
