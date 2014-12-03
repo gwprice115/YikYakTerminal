@@ -1,16 +1,21 @@
 package features;
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,13 +37,34 @@ public class FeatureSelector {
 //		yaks = new ArrayList<Yak>();
 		uniqueVocab = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
-
-		
 		firstPass(inputFiles);
-		
-		secondPass(inputFiles);
-		
-
+		secondPass(inputFiles, true);
+	}
+	
+	public FeatureSelector(List<String> testFiles, String dictionaryFile){
+		vocabulary = new HashSet<String>();
+		dictionaryMap = new HashMap<String,Integer>();
+		readDictionary(dictionaryFile);
+		secondPass(testFiles, false);
+	}
+	
+	private void readDictionary(String dictionaryFile){
+		//read in vocab
+		String wordEntry;
+		BufferedReader reader;
+		try {
+			reader = new BufferedReader(new FileReader(dictionaryFile));
+			while((wordEntry=reader.readLine())!=null){
+				Matcher m = Pattern.compile("(.+):(.+)").matcher(wordEntry);
+				if(m.matches()){
+					//store in dictionary map as word --> feature number
+					dictionaryMap.put(m.group(1),Integer.parseInt(m.group(2)));
+				}
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new RuntimeException("Issues loading dictionary file from training.");
+		}
 	}
 	
 	private void firstPass(List<String> inputFiles) {
@@ -79,11 +105,9 @@ public class FeatureSelector {
 			}
 			
 			//write out dictionary
-			PrintWriter writer = new PrintWriter(new FileWriter("vocabulary.txt"));
-			int featureNum = 1;
-			for(String word: vocabulary){
-				writer.println(word+":"+featureNum);
-				featureNum++;
+			PrintWriter writer = new PrintWriter(new FileWriter("dictionary.txt"));
+			for(String word: dictionaryMap.keySet()){
+				writer.println(word+":"+dictionaryMap.get(word));
 			}
 			writer.close();
 			
@@ -94,39 +118,41 @@ public class FeatureSelector {
 	}
 
 	private void parseWordsFirstPass(String yakText) {
-		for (String word: getWords(yakText)){
+		List<String> yakWords = getWords(yakText);
+		for (String word: yakWords){
 			addToVocab(word);
+		}
+		int size = dictionaryMap.size();
+		for(int i = 0; i<yakWords.size()-1;i++){
+			dictionaryMap.put(yakWords.get(i)+" "+yakWords.get(i+1), size+1);
+			size++;
 		}
 	}
 	
 
-	private void secondPass(List<String> inputFiles) {
+	private void secondPass(List<String> inputFiles, boolean train) {
 		try {
 			BufferedReader reader;
-			String sentence, maybeHeader, yakText, likeLine, comments, header, unigramFeatures="";
-			int likes, postDate, commentNum, uniqueCount=0, numWords, numChars;
-			double postTime;
-			PrintWriter featureW = new PrintWriter(new FileWriter("features.txt")); //features of cases
-			PrintWriter labelW = new PrintWriter(new FileWriter("labels.txt")); //labels of cases
-			
+			String sentence, maybeHeader, yakText, likeLine, comments, header;
+			int likes, postDate, commentNum, uniqueCount=0, numWords, numChars, dayOfWeek;
+			long postTime;
+			TreeMap<Integer,Integer> gramFeatureMap;
+			String featureFile;
+			if(train){
+				featureFile="features_train";
+			}else{
+				featureFile = "features_test";
+			}
+			PrintWriter featureW = new PrintWriter(new FileWriter(featureFile+".txt")); //features of cases
+			PrintWriter labelW = new PrintWriter(new FileWriter("labels_test.txt")); //labels of cases
 			//get vocab & store yaks
 			Pattern headerPattern = Pattern.compile(".*###\\s(.*)\\s###"); //group(1)== header
-			Pattern likeLinePattern = Pattern.compile("\\s*(-?\\d+)\\slikes.*");
+			Pattern likeLinePattern = Pattern.compile("\\s*(-?\\d+)\\slikes.*Posted\\s+([0123456789-]+)\\s+([0123456789:]+).*");
 //			"\\s(-?\\d+)\\slikes\\s*|\\s*Posted\\s*(\\d[4]-\\d[2]-\\d[2])\\s*(\\d[2]:\\d[2]:\\d[2]).*");
 			//group(1)==number of likes. group(2)==date posted. group(3)==time posted.
 			Pattern commentPattern = Pattern.compile("\\s*Comments:\\s*(\\d+)"); //group(1)==commentNum
 			
-			//read in vocab
-			String wordEntry;
-			reader = new BufferedReader(new FileReader("vocabulary.txt"));
-			while((wordEntry=reader.readLine())!=null){
-				Matcher m = Pattern.compile("(.+):(.+)").matcher(wordEntry);
-				if(m.matches()){
-					//store in dictionary map as word --> feature number
-					dictionaryMap.put(m.group(1),Integer.parseInt(m.group(2)));
-				}
-			}
-			
+			Calendar calendar = Calendar.getInstance();
 			
 			for (String inputFile: inputFiles){
 				Matcher m = Pattern.compile("(\\d)(.*)File.*").matcher(inputFile);
@@ -162,33 +188,54 @@ public class FeatureSelector {
 						List<String> yakWords = getWords(yakText);
 						numChars = yakText.length();
 						numWords = yakWords.size();
-						unigramFeatures = "";
 						for (String word: yakWords){
 							Integer wordCount = bagOfWords.get(word) != null ? bagOfWords.get(word) : 0;
 							bagOfWords.put(word, wordCount+1);
 						}
+						gramFeatureMap = new TreeMap<Integer,Integer>();
 						for(String word : bagOfWords.keySet()){
 							Integer wordNum = dictionaryMap.get(word);
 							if(wordNum!=null){
-								unigramFeatures += wordNum+":"+bagOfWords.get(word)+" ";
+								gramFeatureMap.put(wordNum, bagOfWords.get(word));
+							} else if (!train){ //this is for testing
+								uniqueCount++;
 							}
-							if(uniqueVocab.contains(word)){
+							if(train && uniqueVocab.contains(word)){ //this is for training
 								uniqueCount++;
 							}
 						}
+						//bigrams
+						HashMap<String,Integer> bigramBOW = new HashMap<String,Integer>();
+						for (int i= 0; i < yakWords.size()-1; i++){
+							String bigram = yakWords.get(i)+"++"+yakWords.get(i+1);
+							int count = bigramBOW.get(bigram)==null ? 0: bigramBOW.get(bigram);
+							bigramBOW.put(bigram, count+1);
+						}
+						for(String bigram : bigramBOW.keySet()){
+							Integer wordNum = dictionaryMap.get(bigram);
+							if(wordNum!=null){
+								gramFeatureMap.put(wordNum, bigramBOW.get(bigram));
+							} 
+						}
 						
 						
+						
+						//likeLine has likes, date, time, GPS
 						likeLine = reader.readLine();
 						try{
 							Matcher mLike = likeLinePattern.matcher(likeLine);
 							mLike.matches();
 							likes = Integer.parseInt(mLike.group(1));
+							calendar.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(mLike.group(2)+" "+mLike.group(3)));
+							dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+							postTime = calendar.get(Calendar.SECOND)+calendar.get(Calendar.MINUTE)*60+calendar.get(Calendar.HOUR_OF_DAY)*3600;
 						}
 						catch(Exception e){
 							reader.close();
 							throw new RuntimeException("Problem with parsing likes: "+e);
 						}
-						//TODO: postdate, posttime
+
+						
 						comments = reader.readLine();
 						try{
 							Matcher mComment = commentPattern.matcher(comments);
@@ -198,7 +245,7 @@ public class FeatureSelector {
 						catch(Exception e){
 							reader.close();
 							throw new RuntimeException("Problem with parsing comments: "+e);
-						}//TODO: post date, post time
+						}
 					} else {
 						reader.close();
 						throw new RuntimeException("Number of lines of a yikyak isn't what was expected");
@@ -208,10 +255,33 @@ public class FeatureSelector {
 					
 					//SHANNON WORKING ON THIS
 					//print out features, and likes, for each and every Yak
-					//unigrams
-					featureW.print(unigramFeatures); //has space on end
+					if(train){
+						featureW.print(likes+" ");
+					}else{
+						featureW.print(0+" ");
+						labelW.println(likes);	//prints likes only in separate file for testing
+					}
 					
-					int nextIndex = vocabulary.size()+1;
+					
+					//unigrams
+					Iterator<Integer> unigramIter = gramFeatureMap.keySet().iterator();
+					while(unigramIter.hasNext()){
+						int featureNum = unigramIter.next();
+						featureW.print(featureNum+":"+gramFeatureMap.get(featureNum)+" ");
+					}
+					
+					int nextIndex = dictionaryMap.size()+1;
+					
+					//dayOfWeek
+					featureW.print(nextIndex+":"+dayOfWeek+" ");
+					nextIndex++;
+					//posttime
+					featureW.print(nextIndex+":"+postTime+" ");
+					nextIndex++;
+					//school
+					int schoolIndex = school.ordinal()+1;
+					featureW.print(nextIndex+":"+schoolIndex+" "); //enum index starts at 0, so must add 1
+					nextIndex++;
 					
 					//header?
 					if(header != null){
@@ -245,14 +315,12 @@ public class FeatureSelector {
 //						}
 //					}
 					featureW.print("\n");
-					
-					//prints out likes in label file (only thing to label file each time
-					labelW.println(likes);
+
 				}
-				featureW.close();
-				labelW.close();
 				reader.close();
 			}
+			featureW.close();	//must close out of file loop in order to write all features for all input files
+			labelW.close();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -360,8 +428,39 @@ public class FeatureSelector {
 		//since is set, add(word) returns true if successfully added, false if already there
 		if (vocabulary.add(word)){
 			uniqueVocab.add(word);
+			dictionaryMap.put(word, dictionaryMap.size()+1);
 		} else {
 			uniqueVocab.remove(word); //not actually unique, because already in set of vocab
+		}
+	}
+	
+	
+	//enum for school
+	public enum School {
+		COLUMBIA, CLAREMONT, GEORGIA, TEXAS, CLEMSON, WAKE, STANFORD, COLGATE, UTAH;
+		public static School getSchool(String s){
+			String upper = s.toUpperCase();
+			if (upper.equals("COLUMBIA")){
+				return COLUMBIA;
+			}else if (upper.equals("CLAREMONT")){
+				return CLAREMONT;
+			}else if (upper.equals("STANFORD")){
+					return STANFORD;
+			}else if (upper.equals("GEORGIA")){
+				return GEORGIA;
+			} else if (upper.equals("TEXAS")){
+				return TEXAS;
+			} else if (upper.equals("CLEMSON")){
+				return CLEMSON;
+			} else if (upper.equals("WAKE")){
+				return WAKE;
+			} else if (upper.equals("COLGATE")){
+				return COLGATE;
+			} else if (upper.equals("UTAH")){
+				return UTAH;
+			} else {
+				throw new RuntimeException("Invalid schoolname");
+			}
 		}
 	}
 	
@@ -369,9 +468,13 @@ public class FeatureSelector {
 		// TODO Auto-generated method stub
 		List<String> inputFiles = new ArrayList<String>();
 		inputFiles.add("4claremontFile.txt");
+		inputFiles.add("4stanfordFile.txt");
+		List<String> testFiles = new ArrayList<String>();
+		testFiles.add("4claremontFile.txt");
 		
 		FeatureSelector f = new FeatureSelector(inputFiles);
-//		f.printFeatures("features", "labels", "types");
+//		FeatureSelector test = new FeatureSelector(testFiles, "dictionary.txt");
+		
 	}
 
 }
