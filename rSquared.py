@@ -1,6 +1,9 @@
 
 
-#takes in (1) a prediction file and (2) a data file
+# school_rand_labels_test 
+
+
+#takes in (1) a prediction file and (2) an actualdata file
 
 import sys
 from itertools import izip
@@ -16,7 +19,7 @@ dataPointCount = 0
 with open(dataPath) as dataFile :
 	for d in dataFile :
 		dataPointCount = dataPointCount + 1
-		dVal = int(d)
+		dVal = float(d)
 		dataValSum = dataValSum + dVal
 dataValMean = dataValSum / dataPointCount
 
@@ -26,5 +29,5 @@ with open(predPath) as predFile, open(dataPath) as dataFile:
         pVal = int(p.split(" ")[0])
         dfms = dfms + (dVal - dataValMean)*(dVal - dataValMean)
         dfps = dfps + (dVal - pVal)*(dVal - pVal)
-        
+
 print str(1 - (dfps / dfms) ) #r-squared!!!       
