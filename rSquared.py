@@ -25,8 +25,8 @@ dataValMean = dataValSum / dataPointCount
 
 with open(predPath) as predFile, open(dataPath) as dataFile: 
     for p, d in izip(predFile, dataFile):
-        dVal = int(d)
-        pVal = int(p.split(" ")[0])
+        dVal = float(d)
+        pVal = float(p.split(" ")[0])
         dfms = dfms + (dVal - dataValMean)*(dVal - dataValMean)
         dfps = dfps + (dVal - pVal)*(dVal - pVal)
 
