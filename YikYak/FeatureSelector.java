@@ -31,17 +31,19 @@ public class FeatureSelector {
 //	protected List<Yak> yaks;
 	protected Set<String> uniqueVocab;
 	protected Map<String, Integer> dictionaryMap;
+	protected String fileExt; 
 
 	/**
 	 * for training
 	 * and creating external dictionary file
 	 * @param inputFiles
 	 */
-	public FeatureSelector(List<String> inputFiles) {
+	public FeatureSelector(List<String> inputFiles, String filenameaddon) {
 		vocabulary = new HashSet<String>();
 //		yaks = new ArrayList<Yak>();
 		uniqueVocab = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
+		fileExt = filenameaddon;
 		firstPass(inputFiles);
 		secondPass(inputFiles, true);
 	}
@@ -52,9 +54,10 @@ public class FeatureSelector {
 	 * @param testFiles
 	 * @param dictionaryFile
 	 */
-	public FeatureSelector(List<String> testFiles, String dictionaryFile){
+	public FeatureSelector(List<String> testFiles, String dictionaryFile, String filenameaddon){		
 		vocabulary = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
+		fileExt = filenameaddon;
 		readDictionary(dictionaryFile);
 		secondPass(testFiles, false);
 	}
@@ -98,7 +101,7 @@ public class FeatureSelector {
 			double postTime;
 			
 			for (String inputFile: inputFiles){
-				Matcher m = Pattern.compile("(\\d)(.*)File.*").matcher(inputFile);
+				Matcher m = Pattern.compile("(.*)File.*").matcher(inputFile);
 				School school = null;
 				int hour = 0;
 				if (!m.matches()){
@@ -196,12 +199,12 @@ public class FeatureSelector {
 			TreeMap<Integer,Integer> gramFeatureMap;
 			String featureFile;
 			if(train){
-				featureFile="features_train";
+				featureFile=fileExt+"_features_train";
 			}else{
-				featureFile = "features_test";
+				featureFile = fileExt+"_features_test";
 			}
 			PrintWriter featureW = new PrintWriter(new FileWriter(featureFile+".txt")); //features of cases
-			PrintWriter labelW = new PrintWriter(new FileWriter("labels_test.txt")); //labels of cases
+			PrintWriter labelW = new PrintWriter(new FileWriter(fileExt+"_labels_test.txt")); //labels of cases
 			//get vocab & store yaks
 			Pattern headerPattern = Pattern.compile(".*###\\s(.*)\\s###"); //group(1)== header
 			Pattern likeLinePattern = Pattern.compile("\\s*(-?\\d+)\\slikes.*Posted\\s+([0123456789-]+)\\s+([0123456789:]+).*");
@@ -212,12 +215,13 @@ public class FeatureSelector {
 			Calendar calendar = Calendar.getInstance();
 			
 			for (String inputFile: inputFiles){
-				Matcher m = Pattern.compile("(\\d)(.*)File.*").matcher(inputFile);
+				System.out.println(inputFile);
+				Matcher m = Pattern.compile("(.*)File.*").matcher(inputFile);
 				School school = null;
 				int hour = 0;
 				if (m.matches()){
-					school = School.getSchool(m.group(2));
-					hour = Integer.parseInt(m.group(1));
+					school = School.getSchool(m.group(1));
+//					hour = Integer.parseInt(m.group(1));
 				} else {
 					throw new RuntimeException("Problems with school/hour matching in filename");
 				}
@@ -441,15 +445,73 @@ public class FeatureSelector {
 	
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		List<String> inputFiles = new ArrayList<String>();
-		inputFiles.add("4claremontFile.txt");
-		inputFiles.add("4stanfordFile.txt");
-		List<String> testFiles = new ArrayList<String>();
-		testFiles.add("4claremontFile.txt");
-		testFiles.add("4stanfordFile.txt");
+		ArrayList<String> schools = new ArrayList<String>();
+		schools.add("claremont");
+		schools.add("clemson");
+		schools.add("columbia");
+		schools.add("colgate");
+		schools.add("georgia");
+		schools.add("stanford");
+		schools.add("texas");
+		schools.add("utah");
+		schools.add("wake");
+
+		for(String school : schools){
+
+			List<String> inputFiles = new ArrayList<String>();
+			inputFiles.add(school+"File.train");
+			FeatureSelector trainData = new FeatureSelector(inputFiles, school);
+			
+			
+			List<String> timeTestFiles = new ArrayList<String>();
+			timeTestFiles.add(school+"File.time");
+			FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", school+"_time");
+
+			List<String> randTestFiles = new ArrayList<String>();
+			randTestFiles.add(school+"File.rand");
+
+			FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", school+"_rand");
+		}
 		
-		FeatureSelector f = new FeatureSelector(inputFiles);
-		FeatureSelector test = new FeatureSelector(testFiles, "dictionary.txt");
+		ArrayList<String> allSchoolsTrain = new ArrayList<String>();
+		allSchoolsTrain.add("claremontFile.train");
+		allSchoolsTrain.add("clemsonFile.train");
+		allSchoolsTrain.add("columbiaFile.train");
+		allSchoolsTrain.add("colgateFile.train");
+		allSchoolsTrain.add("georgiaFile.train");
+		allSchoolsTrain.add("stanfordFile.train");
+		allSchoolsTrain.add("texasFile.train");
+		allSchoolsTrain.add("utahFile.train");
+		allSchoolsTrain.add("wakeFile.train");
+		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, "all_schools");
+		
+		ArrayList<String> timeAll = new ArrayList<String>();
+		timeAll.add("claremontFile.time");
+		timeAll.add("clemsonFile.time");
+		timeAll.add("columbiaFile.time");
+		timeAll.add("colgateFile.time");
+		timeAll.add("georgiaFile.time");
+		timeAll.add("stanfordFile.time");
+		timeAll.add("texasFile.time");
+		timeAll.add("utahFile.time");
+		timeAll.add("wakeFile.time");
+		System.out.println("all school time--------");
+		FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", "all_schools_time");
+		
+		ArrayList<String> randAll = new ArrayList<String>();
+		randAll.add("claremontFile.rand");
+		randAll.add("clemsonFile.rand");
+		randAll.add("columbiaFile.rand");
+		randAll.add("colgateFile.rand");
+		randAll.add("georgiaFile.rand");
+		randAll.add("stanfordFile.rand");
+		randAll.add("texasFile.rand");
+		randAll.add("utahFile.rand");
+		randAll.add("wakeFile.rand");
+		System.out.println("all school rand--------");
+		FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", "all_schools_rand");
+
+		
 		
 	}
 
