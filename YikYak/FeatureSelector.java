@@ -236,7 +236,7 @@ public class FeatureSelector {
 			if(train){
 				featureFile=fileExt+".features_train";
 			}else{
-				featureFile = fileExt+".features_test";
+				featureFile =fileExt+".features_test";
 			}
 			PrintWriter featureW = new PrintWriter(new FileWriter(featureFile+".txt")); //features of cases
 			PrintWriter labelW = new PrintWriter(new FileWriter(fileExt+".labels.txt")); //labels of cases
@@ -408,33 +408,28 @@ public class FeatureSelector {
 						}
 
 						if(featureFlags[2]){
-							//posttime
-							featureW.print(nextIndex+":"+postTime+" ");
-							nextIndex++;
-						}
-						if(featureFlags[3]){
 							//header?
 							if(header != null){
 								featureW.print(nextIndex+":1 ");
 							}
 							nextIndex++;
 						}
-						if(featureFlags[4]){
+						if(featureFlags[3]){
 							//length (words)
 							featureW.print(nextIndex+":"+numWords+" ");
 							nextIndex++;
 						}
-						if(featureFlags[5]){
+						if(featureFlags[4]){
 							//length (characters)
 							featureW.print(nextIndex+":"+numChars+" ");
 							nextIndex++;
 						}
-						if(featureFlags[6]){
+						if(featureFlags[5]){
 							//unique words
 							featureW.print(nextIndex+":"+uniqueCount+" ");
 							nextIndex++;
 						}
-						if(featureFlags[7]){
+						if(featureFlags[6]){
 							//num capital letters
 							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 							nextIndex++;	
@@ -528,6 +523,7 @@ public class FeatureSelector {
 	}
 	
 	public static void main(String[] args) {
+		String flagsExt = Arrays.toString(args);
 		boolean[] featureFlags = new boolean[args.length];
 		for(int i =0; i <args.length;i++){
 			featureFlags[i]=(Integer.parseInt(args[i])==1);
@@ -551,17 +547,17 @@ public class FeatureSelector {
 
 		 	List<String> inputFiles = new ArrayList<String>();
 		 	inputFiles.add(school+"File.train");
-		 	FeatureSelector trainData = new FeatureSelector(inputFiles, school, featureFlags);
+		 	FeatureSelector trainData = new FeatureSelector(inputFiles, flagsExt+school, featureFlags);
 			
 			
 		 	List<String> timeTestFiles = new ArrayList<String>();
 		 	timeTestFiles.add(school+"File.time");
-		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", school+".time", featureFlags);
+		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", flagsExt+school+".time", featureFlags);
 
 		 	List<String> randTestFiles = new ArrayList<String>();
 		 	randTestFiles.add(school+"File.rand");
 
-		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", school+".rand", featureFlags);
+		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", flagsExt+school+".rand", featureFlags);
 		 }
 		
 		ArrayList<String> allSchoolsTrain = new ArrayList<String>();
@@ -574,7 +570,7 @@ public class FeatureSelector {
 		allSchoolsTrain.add("texasFile.train");
 		allSchoolsTrain.add("utahFile.train");
 		allSchoolsTrain.add("wakeFile.train");
-		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FeatureSelector.ALL_SCHOOLS, featureFlags);
+		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, flagsExt+FeatureSelector.ALL_SCHOOLS, featureFlags);
 		
 		 ArrayList<String> timeAll = new ArrayList<String>();
 		 timeAll.add("claremontFile.time");
@@ -586,7 +582,7 @@ public class FeatureSelector {
 		 timeAll.add("texasFile.time");
 		 timeAll.add("utahFile.time");
 		 timeAll.add("wakeFile.time");
-		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", "all_schools.time", featureFlags);
+		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", flagsExt+"all_schools.time", featureFlags);
 		
 		 ArrayList<String> randAll = new ArrayList<String>();
 		 randAll.add("claremontFile.rand");
@@ -598,7 +594,7 @@ public class FeatureSelector {
 		 randAll.add("texasFile.rand");
 		 randAll.add("utahFile.rand");
 		 randAll.add("wakeFile.rand");
-		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", "all_schools.rand", featureFlags);
+		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", flagsExt+"all_schools.rand", featureFlags);
 
 		
 		
