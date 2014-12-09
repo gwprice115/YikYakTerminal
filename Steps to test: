@@ -3,3 +3,13 @@ Steps to test:
 1. Create files in correct format using FeatureSelector
 2. Run svm-learn -z c file[1] file[2]
 3. Run accuracy.py with these files
+
+
+
+./svm_learn -z c ~/Documents/NLP/YikYakTerminal/YikYak/unigrams.regressionall_schools._features_train.txt ~/Documents/NLP/YikYakTerminal/regressionModels/unigrams.regressionall_schools.model
+
+
+./svm_classify ~/Documents/NLP/YikYakTerminal/YikYak/all.with_schoolall_schools.rand_features_test.txt ~/Documents/NLP/YikYakTerminal/regressionModels/all.with_schoolall_schools.model ~/Documents/NLP/YikYakTerminal/YikYak/all.with_schoolall_schools.rand.output
+
+
+python accuracy.py ~/Documents/NLP/YikYakTerminal/YikYak/all.with_schoolall_schools.rand.output ~/Documents/NLP/YikYakTerminal/YikYak/all.with_schoolall_schools.rand_labels_test.txt 
