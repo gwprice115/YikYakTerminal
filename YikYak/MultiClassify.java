@@ -5,7 +5,7 @@ public class MultiClassify {
 	
 	public static void main(String[] args) {
 		//unigrams, dayOfWeek, header?, length(words), length(chars), uniqueWords, numCapLetters
-		int numFeatures = 7;
+		int numFeatures = 6;
 		PrintWriter writer = null;
 		PrintWriter cwriter= null;
 		String subsetString;
