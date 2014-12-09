@@ -1,4 +1,4 @@
-// package features;
+package features;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -28,6 +28,7 @@ import java.util.Map.Entry;
 
 public class FeatureSelector {
 	double stopListParam = 0.01;
+	public static final String ALL_SCHOOLS = "all_schools.";
 	protected  Map<String, HashMap<String, Integer>> bigrams;
 	protected  HashMap<String, Integer> unigrams = new HashMap<String, Integer>();
 	protected  Set<String> vocabulary;
@@ -144,12 +145,10 @@ public class FeatureSelector {
 		}
 		for (int i = 0; i <unigrams.size()*commonFraction; i++){
 			Entry<Double, String> next = sorted.pollFirstEntry();
-			System.out.println("gone: "+next.getValue()+" "+next.getKey());
 			sorted.remove(next.getKey());
 			dictionaryMap.remove(next.getValue());
 		}
 		for (String word: uniqueVocab){
-			System.out.println("unique "+word);
 			dictionaryMap.remove(word);
 		}
 			
@@ -338,33 +337,69 @@ public class FeatureSelector {
 					}
 					
 					//print out features, and likes, for each and every Yak
+					boolean printingThisFeature = false;
 					if(train){
-						featureW.print(likes+" ");
+						if (fileExt.equals(FeatureSelector.ALL_SCHOOLS)){
+							if (likes <=2){
+								featureW.print("-1"+" ");
+								printingThisFeature = true;
+							} else if (likes>23){
+								featureW.print("+1"+" ");
+								printingThisFeature = true;
+							}
+						} else {
+							if (likes <=4){
+								featureW.print("-1"+" ");
+								printingThisFeature = true;
+							} else if (likes>31){
+								featureW.print("+1"+" ");
+								printingThisFeature = true;
+							}
+						}
 					}else{
-						featureW.print(0+" ");
-						labelW.println(likes);	//prints likes only in separate file for testing
+						if (fileExt.equals(FeatureSelector.ALL_SCHOOLS)){
+							if (likes <=2){
+								featureW.print(0+" ");
+								labelW.println("-1");	//prints likes only in separate file for testing
+								printingThisFeature = true;
+							} else if (likes>23){
+								featureW.print(0+" ");
+								labelW.println("+1");	//prints likes only in separate file for testing
+								printingThisFeature = true;
+							}
+						} else {
+							if (likes <=4){
+								featureW.print(0+" ");
+								labelW.println("-1");	//prints likes only in separate file for testing
+								printingThisFeature = true;
+							} else if (likes>31){
+								featureW.print(0+" ");
+								labelW.println("+1");	//prints likes only in separate file for testing
+								printingThisFeature = true;
+							}
+						}
 					}
 					
 					
 					//unigrams
-					// Iterator<Integer> gramIter = gramFeatureMap.keySet().iterator();
-					// while(gramIter.hasNext()){
-					// 	int featureNum = gramIter.next();
-					// 	featureW.print(featureNum+":"+gramFeatureMap.get(featureNum)+" ");
-					// }
+					 Iterator<Integer> gramIter = gramFeatureMap.keySet().iterator();
+					 while(gramIter.hasNext() && printingThisFeature){
+					 	int featureNum = gramIter.next();
+					 	featureW.print(featureNum+":"+gramFeatureMap.get(featureNum)+" ");
+					 }
 					
-					int nextIndex = dictionaryMap.size()+1;
+//					int nextIndex = dictionaryMap.size()+1;
 					
-					//dayOfWeek
-					featureW.print(nextIndex+":"+dayOfWeek+" ");
-					nextIndex++;
-					//posttime
-					featureW.print(nextIndex+":"+postTime+" ");
-					nextIndex++;
-					//school
-					int schoolIndex = school.ordinal()+1;
-					featureW.print(nextIndex+":"+schoolIndex+" "); //enum index starts at 0, so must add 1
-					nextIndex++;
+//					//dayOfWeek
+//					featureW.print(nextIndex+":"+dayOfWeek+" ");
+//					nextIndex++;
+//					//posttime
+//					featureW.print(nextIndex+":"+postTime+" ");
+//					nextIndex++;
+//					//school
+//					int schoolIndex = school.ordinal()+1;
+//					featureW.print(nextIndex+":"+schoolIndex+" "); //enum index starts at 0, so must add 1
+//					nextIndex++;
 					
 					//header?
 					// if(header != null){
@@ -383,8 +418,9 @@ public class FeatureSelector {
 					// //num capital letters
 					// featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 					// nextIndex++;	
-					featureW.print("\n");
-
+					 if (printingThisFeature){
+						 featureW.print("\n");
+					 }
 				}
 				reader.close();
 			}
@@ -474,31 +510,32 @@ public class FeatureSelector {
 		// TODO Auto-generated method stub
 		ArrayList<String> schools = new ArrayList<String>();
 		schools.add("claremont");
-		schools.add("clemson");
-		schools.add("columbia");
-		schools.add("colgate");
-		schools.add("georgia");
-		schools.add("stanford");
-		schools.add("texas");
-		schools.add("utah");
-		schools.add("wake");
+//		schools.add("clemson");
+//		schools.add("columbia");
+//		schools.add("colgate");
+//		schools.add("georgia");
+//		schools.add("stanford");
+//		schools.add("texas");
+//		schools.add("utah");
+//		schools.add("wake");
 
-		// for(String school : schools){
+		//trains & tests for each individual school
+		 for(String school : schools){
 
-		// 	List<String> inputFiles = new ArrayList<String>();
-		// 	inputFiles.add(school+"File.train");
-		// 	FeatureSelector trainData = new FeatureSelector(inputFiles, school);
+		 	List<String> inputFiles = new ArrayList<String>();
+		 	inputFiles.add(school+"File.train");
+		 	FeatureSelector trainData = new FeatureSelector(inputFiles, school);
 			
 			
-		// 	List<String> timeTestFiles = new ArrayList<String>();
-		// 	timeTestFiles.add(school+"File.time");
-		// 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", school+"_time");
+		 	List<String> timeTestFiles = new ArrayList<String>();
+		 	timeTestFiles.add(school+"File.time");
+		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", school+".time");
 
-		// 	List<String> randTestFiles = new ArrayList<String>();
-		// 	randTestFiles.add(school+"File.rand");
+		 	List<String> randTestFiles = new ArrayList<String>();
+		 	randTestFiles.add(school+"File.rand");
 
-		// 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", school+"_rand");
-		// }
+		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", school+".rand");
+		 }
 		
 		ArrayList<String> allSchoolsTrain = new ArrayList<String>();
 		allSchoolsTrain.add("claremontFile.train");
@@ -510,33 +547,33 @@ public class FeatureSelector {
 		allSchoolsTrain.add("texasFile.train");
 		allSchoolsTrain.add("utahFile.train");
 		allSchoolsTrain.add("wakeFile.train");
-		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, "all_schools");
+		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FeatureSelector.ALL_SCHOOLS);
 		
-		// ArrayList<String> timeAll = new ArrayList<String>();
-		// timeAll.add("claremontFile.time");
-		// timeAll.add("clemsonFile.time");
-		// timeAll.add("columbiaFile.time");
-		// timeAll.add("colgateFile.time");
-		// timeAll.add("georgiaFile.time");
-		// timeAll.add("stanfordFile.time");
-		// timeAll.add("texasFile.time");
-		// timeAll.add("utahFile.time");
-		// timeAll.add("wakeFile.time");
-		// System.out.println("all school time--------");
-		// FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", "all_schools_time");
+		 ArrayList<String> timeAll = new ArrayList<String>();
+		 timeAll.add("claremontFile.time");
+		 timeAll.add("clemsonFile.time");
+		 timeAll.add("columbiaFile.time");
+		 timeAll.add("colgateFile.time");
+		 timeAll.add("georgiaFile.time");
+		 timeAll.add("stanfordFile.time");
+		 timeAll.add("texasFile.time");
+		 timeAll.add("utahFile.time");
+		 timeAll.add("wakeFile.time");
+		 System.out.println("all school time--------");
+		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", "all_schools_time");
 		
-		// ArrayList<String> randAll = new ArrayList<String>();
-		// randAll.add("claremontFile.rand");
-		// randAll.add("clemsonFile.rand");
-		// randAll.add("columbiaFile.rand");
-		// randAll.add("colgateFile.rand");
-		// randAll.add("georgiaFile.rand");
-		// randAll.add("stanfordFile.rand");
-		// randAll.add("texasFile.rand");
-		// randAll.add("utahFile.rand");
-		// randAll.add("wakeFile.rand");
-		// System.out.println("all school rand--------");
-		// FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", "all_schools_rand");
+		 ArrayList<String> randAll = new ArrayList<String>();
+		 randAll.add("claremontFile.rand");
+		 randAll.add("clemsonFile.rand");
+		 randAll.add("columbiaFile.rand");
+		 randAll.add("colgateFile.rand");
+		 randAll.add("georgiaFile.rand");
+		 randAll.add("stanfordFile.rand");
+		 randAll.add("texasFile.rand");
+		 randAll.add("utahFile.rand");
+		 randAll.add("wakeFile.rand");
+		 System.out.println("all school rand--------");
+		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", "all_schools_rand");
 
 		
 		
