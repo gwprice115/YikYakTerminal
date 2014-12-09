@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 //keep a set of unique words
 
 public class FeatureSelector {
-	protected static final String FEATURE_PREFIX = "all.";
+	protected static final String FEATURE_PREFIX = "dayOfWeek.";
 	double stopListParam = 0.01;
 	public static final String ALL_SCHOOLS = "all_schools.";
 	protected  Map<String, HashMap<String, Integer>> bigrams;
@@ -38,18 +38,20 @@ public class FeatureSelector {
 	protected Map<String, Integer> dictionaryMap;
 	protected String fileExt; 
 	protected int maxUnigrams;
+	protected boolean[] featureFlags;
 
 	/**
 	 * for training
 	 * and creating external dictionary file
 	 * @param inputFiles
 	 */
-	public FeatureSelector(List<String> inputFiles, String filenameaddon) {
+	public FeatureSelector(List<String> inputFiles, String filenameaddon, boolean[] featureFlags) {
 		vocabulary = new HashSet<String>();
 //		yaks = new ArrayList<Yak>();
 		uniqueVocab = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
 		fileExt = filenameaddon;
+		this.featureFlags=featureFlags;
 		firstPass(inputFiles, stopListParam);
 		secondPass(inputFiles, true);
 	}
@@ -60,10 +62,11 @@ public class FeatureSelector {
 	 * @param testFiles
 	 * @param dictionaryFile
 	 */
-	public FeatureSelector(List<String> testFiles, String dictionaryFile, String filenameaddon){		
+	public FeatureSelector(List<String> testFiles, String dictionaryFile, String filenameaddon, boolean[] featureFlags){		
 		vocabulary = new HashSet<String>();
 		dictionaryMap = new HashMap<String,Integer>();
 		fileExt = filenameaddon;
+		this.featureFlags=featureFlags;
 		readDictionary(dictionaryFile);
 		secondPass(testFiles, false);
 	}
@@ -319,7 +322,7 @@ public class FeatureSelector {
 							mLike.matches();
 							likes = Integer.parseInt(mLike.group(1));
 							calendar.setTime(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").parse(mLike.group(2)+" "+mLike.group(3)));
-							dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+							dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)-1;//date is 1-7, subtracting 1 to make 0-6
 							postTime = calendar.get(Calendar.SECOND)+calendar.get(Calendar.MINUTE)*60+calendar.get(Calendar.HOUR_OF_DAY)*3600;
 						}
 						catch(Exception e){
@@ -386,48 +389,59 @@ public class FeatureSelector {
 							}
 						}
 					}
-					
+
 					if (printingThisFeature){
+						int nextIndex;
 						//unigrams
-						 
-						 while(!gramFeatureMap.isEmpty()){
-						 	Entry<Integer, Integer> feature = gramFeatureMap.pollFirstEntry();
-						 	featureW.print(feature.getKey()+":"+feature.getValue()+" ");
-						 }
-						
-						int nextIndex = maxUnigrams+1;
-//						
-						//dayOfWeek
-						featureW.print(nextIndex+":"+dayOfWeek+" ");
-						nextIndex++;
-						//posttime
-						featureW.print(nextIndex+":"+postTime+" ");
-						nextIndex++;
-						//school
-						int schoolIndex = school.ordinal()+1;
-						featureW.print(nextIndex+":"+schoolIndex+" "); //enum index starts at 0, so must add 1
-						nextIndex++;
-						
-						//header?
-						 if(header != null){
-						 	featureW.print(nextIndex+":1 ");
-						 }
-						 nextIndex++;
-						 //length (words)
-						 featureW.print(nextIndex+":"+numWords+" ");
-						 nextIndex++;
-						 //length (characters)
-						 featureW.print(nextIndex+":"+numChars+" ");
-						 nextIndex++;
-						 //unique words
-						 featureW.print(nextIndex+":"+uniqueCount+" ");
-						 nextIndex++;
-						 //num capital letters
-						 featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
-						 nextIndex++;	
-				
+						if(featureFlags[0]){
+							while(!gramFeatureMap.isEmpty()){
+								Entry<Integer, Integer> feature = gramFeatureMap.pollFirstEntry();
+								featureW.print(feature.getKey()+":"+feature.getValue()+" ");
+							}
+							nextIndex = maxUnigrams+1;
+						}
+						else{
+							nextIndex = 1;
+						}
+						if(featureFlags[1]){
+							//dayOfWeek (each is a separate feature that receives a 1 if it is that day.)
+							featureW.print(nextIndex+dayOfWeek+":1 ");
+							nextIndex+=7; //increment next index over all possible day indices
+						}
+
+						if(featureFlags[2]){
+							//posttime
+							featureW.print(nextIndex+":"+postTime+" ");
+							nextIndex++;
+						}
+						if(featureFlags[3]){
+							//header?
+							if(header != null){
+								featureW.print(nextIndex+":1 ");
+							}
+							nextIndex++;
+						}
+						if(featureFlags[4]){
+							//length (words)
+							featureW.print(nextIndex+":"+numWords+" ");
+							nextIndex++;
+						}
+						if(featureFlags[5]){
+							//length (characters)
+							featureW.print(nextIndex+":"+numChars+" ");
+							nextIndex++;
+						}
+						if(featureFlags[6]){
+							//unique words
+							featureW.print(nextIndex+":"+uniqueCount+" ");
+							nextIndex++;
+						}
+						if(featureFlags[7]){
+							//num capital letters
+							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
+							nextIndex++;	
+						}
 						 featureW.print("\n");
-						 
 					}
 					
 				}
@@ -516,6 +530,12 @@ public class FeatureSelector {
 	}
 	
 	public static void main(String[] args) {
+		boolean[] featureFlags = new boolean[args.length];
+		for(int i =0; i <args.length;i++){
+			featureFlags[i]=(Integer.parseInt(args[i])==1);
+		}
+		
+		
 		// TODO Auto-generated method stub
 		ArrayList<String> schools = new ArrayList<String>();
 		schools.add("claremont");
@@ -533,17 +553,17 @@ public class FeatureSelector {
 
 		 	List<String> inputFiles = new ArrayList<String>();
 		 	inputFiles.add(school+"File.train");
-		 	FeatureSelector trainData = new FeatureSelector(inputFiles, FEATURE_PREFIX+school);
+		 	FeatureSelector trainData = new FeatureSelector(inputFiles, FEATURE_PREFIX+school, featureFlags);
 			
 			
 		 	List<String> timeTestFiles = new ArrayList<String>();
 		 	timeTestFiles.add(school+"File.time");
-		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".time");
+		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".time", featureFlags);
 
 		 	List<String> randTestFiles = new ArrayList<String>();
 		 	randTestFiles.add(school+"File.rand");
 
-		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".rand");
+		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".rand", featureFlags);
 		 }
 		
 		ArrayList<String> allSchoolsTrain = new ArrayList<String>();
@@ -556,7 +576,7 @@ public class FeatureSelector {
 		allSchoolsTrain.add("texasFile.train");
 		allSchoolsTrain.add("utahFile.train");
 		allSchoolsTrain.add("wakeFile.train");
-		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FEATURE_PREFIX+FeatureSelector.ALL_SCHOOLS);
+		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FEATURE_PREFIX+FeatureSelector.ALL_SCHOOLS, featureFlags);
 		
 		 ArrayList<String> timeAll = new ArrayList<String>();
 		 timeAll.add("claremontFile.time");
@@ -569,7 +589,7 @@ public class FeatureSelector {
 		 timeAll.add("utahFile.time");
 		 timeAll.add("wakeFile.time");
 		 System.out.println("all school time--------");
-		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.time");
+		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.time", featureFlags);
 		
 		 ArrayList<String> randAll = new ArrayList<String>();
 		 randAll.add("claremontFile.rand");
@@ -582,7 +602,7 @@ public class FeatureSelector {
 		 randAll.add("utahFile.rand");
 		 randAll.add("wakeFile.rand");
 		 System.out.println("all school rand--------");
-		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.rand");
+		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.rand", featureFlags);
 
 		
 		
