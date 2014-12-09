@@ -1,0 +1,50 @@
+features: unigrams, day of week, header, capital letters, num chars
+
+features [1, 0, 1, 0, 0]
+rand: correct 194	total 299	accuracy: 0.648829431438	
+time: correct 188	total 272	accuracy: 0.691176470588	
+features [1, 0, 0, 0, 0]
+rand: correct 194	total 299	accuracy: 0.648829431438	
+time: correct 188	total 272	accuracy: 0.691176470588	
+features [1, 0, 0, 1, 0]
+rand: correct 188	total 299	accuracy: 0.628762541806	
+time: correct 185	total 272	accuracy: 0.680147058824	
+features [1, 0, 1, 1, 0]
+rand: correct 186	total 299	accuracy: 0.622073578595	
+time: correct 182	total 272	accuracy: 0.669117647059	
+features [1, 1, 1, 0, 0]
+rand: correct 186	total 299	accuracy: 0.622073578595	
+time: correct 186	total 272	accuracy: 0.683823529412	
+features [1, 1, 0, 0, 0]
+rand: correct 186	total 299	accuracy: 0.622073578595	
+time: correct 184	total 272	accuracy: 0.676470588235	
+features [0, 1, 1, 1, 0]
+rand: correct 185	total 299	accuracy: 0.61872909699	
+time: correct 130	total 272	accuracy: 0.477941176471	
+features [0, 1, 0, 1, 0]
+rand: correct 185	total 299	accuracy: 0.61872909699	
+time: correct 130	total 272	accuracy: 0.477941176471	
+features [0, 1, 1, 0, 0]
+rand: correct 185	total 299	accuracy: 0.61872909699	
+time: correct 130	total 272	accuracy: 0.477941176471	
+features [0, 1, 0, 0, 0]
+rand: correct 185	total 299	accuracy: 0.61872909699	
+time: correct 130	total 272	accuracy: 0.477941176471	
+features [1, 1, 0, 1, 0]
+rand: correct 182	total 299	accuracy: 0.608695652174	
+time: correct 172	total 272	accuracy: 0.632352941176	
+features [1, 1, 1, 1, 0]
+rand: correct 181	total 299	accuracy: 0.605351170569	
+time: correct 172	total 272	accuracy: 0.632352941176	
+features [0, 0, 1, 1, 0]
+rand: correct 174	total 299	accuracy: 0.581939799331	
+time: correct 154	total 272	accuracy: 0.566176470588	
+features [0, 0, 1, 0, 0]
+rand: correct 172	total 299	accuracy: 0.57525083612	
+time: correct 156	total 272	accuracy: 0.573529411765	
+features [0, 0, 0, 1, 0]
+rand: correct 165	total 299	accuracy: 0.551839464883	
+time: correct 159	total 272	accuracy: 0.584558823529	
+features [0, 0, 0, 0, 0]
+rand: correct 163	total 299	accuracy: 0.545150501672	
+time: correct 161	total 272	accuracy: 0.591911764706	

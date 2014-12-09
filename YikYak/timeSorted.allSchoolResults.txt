@@ -1,0 +1,50 @@
+features: unigrams, day of week, header, capital letters, num chars
+
+features [1, 0, 1, 1, 0]
+rand: correct 1601	total 2144	accuracy: 0.746735074627	
+time: correct 1507	total 2075	accuracy: 0.726265060241	
+features [1, 1, 1, 1, 0]
+rand: correct 1586	total 2144	accuracy: 0.73973880597	
+time: correct 1504	total 2075	accuracy: 0.724819277108	
+features [1, 0, 0, 1, 0]
+rand: correct 1596	total 2144	accuracy: 0.744402985075	
+time: correct 1504	total 2075	accuracy: 0.724819277108	
+features [1, 1, 0, 1, 0]
+rand: correct 1585	total 2144	accuracy: 0.73927238806	
+time: correct 1500	total 2075	accuracy: 0.722891566265	
+features [1, 0, 1, 0, 0]
+rand: correct 1584	total 2144	accuracy: 0.738805970149	
+time: correct 1489	total 2075	accuracy: 0.717590361446	
+features [1, 1, 1, 0, 0]
+rand: correct 1586	total 2144	accuracy: 0.73973880597	
+time: correct 1487	total 2075	accuracy: 0.716626506024	
+features [1, 1, 0, 0, 0]
+rand: correct 1583	total 2144	accuracy: 0.738339552239	
+time: correct 1483	total 2075	accuracy: 0.714698795181	
+features [1, 0, 0, 0, 0]
+rand: correct 1576	total 2144	accuracy: 0.735074626866	
+time: correct 1475	total 2075	accuracy: 0.710843373494	
+features [0, 1, 0, 0, 0]
+rand: correct 1134	total 2144	accuracy: 0.528917910448	
+time: correct 1422	total 2075	accuracy: 0.685301204819	
+features [0, 0, 1, 0, 0]
+rand: correct 1445	total 2144	accuracy: 0.673973880597	
+time: correct 1387	total 2075	accuracy: 0.66843373494	
+features [0, 0, 0, 1, 0]
+rand: correct 1463	total 2144	accuracy: 0.682369402985	
+time: correct 1379	total 2075	accuracy: 0.664578313253	
+features [0, 0, 1, 1, 0]
+rand: correct 1440	total 2144	accuracy: 0.671641791045	
+time: correct 1359	total 2075	accuracy: 0.654939759036	
+features [0, 1, 1, 0, 0]
+rand: correct 1029	total 2144	accuracy: 0.479944029851	
+time: correct 1117	total 2075	accuracy: 0.538313253012	
+features [0, 1, 1, 1, 0]
+rand: correct 1031	total 2144	accuracy: 0.480876865672	
+time: correct 1116	total 2075	accuracy: 0.537831325301	
+features [0, 1, 0, 1, 0]
+rand: correct 1029	total 2144	accuracy: 0.479944029851	
+time: correct 1116	total 2075	accuracy: 0.537831325301	
+features [0, 0, 0, 0, 0]
+rand: correct 643	total 2144	accuracy: 0.299906716418	
+time: correct 653	total 2075	accuracy: 0.314698795181	
