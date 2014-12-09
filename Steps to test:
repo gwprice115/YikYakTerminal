@@ -1,0 +1,5 @@
+Steps to test:
+
+1. Create files in correct format using FeatureSelector
+2. Run svm-learn -z c file[1] file[2]
+3. Run accuracy.py with these files
