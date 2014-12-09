@@ -407,12 +407,12 @@ public class FeatureSelector {
 							nextIndex+=7; //increment next index over all possible day indices
 						}
 
+//						if(featureFlags[2]){
+//							//posttime
+//							featureW.print(nextIndex+":"+postTime+" ");
+//							nextIndex++;
+//						}
 						if(featureFlags[2]){
-							//posttime
-							featureW.print(nextIndex+":"+postTime+" ");
-							nextIndex++;
-						}
-						if(featureFlags[3]){
 							//header?
 							if(header != null){
 								featureW.print(nextIndex+":1 ");
@@ -424,17 +424,17 @@ public class FeatureSelector {
 //							featureW.print(nextIndex+":"+numWords+" ");
 //							nextIndex++;
 //						}
-						if(featureFlags[4]){
+						if(featureFlags[3]){
 							//length (characters)
 							featureW.print(nextIndex+":"+numChars+" ");
 							nextIndex++;
 						}
-						if(featureFlags[5]){
+						if(featureFlags[4]){
 							//unique words
 							featureW.print(nextIndex+":"+uniqueCount+" ");
 							nextIndex++;
 						}
-						if(featureFlags[6]){
+						if(featureFlags[5]){
 							//num capital letters
 							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 							nextIndex++;	
