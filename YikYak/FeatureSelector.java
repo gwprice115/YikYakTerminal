@@ -424,20 +424,20 @@ public class FeatureSelector {
 //							featureW.print(nextIndex+":"+numWords+" ");
 //							nextIndex++;
 //						}
+						// if(featureFlags[4]){
+						// 	//unique words
+						// 	featureW.print(nextIndex+":"+uniqueCount+" ");
+						// 	nextIndex++;
+						// }
 						if(featureFlags[3]){
-							//length (characters)
-							featureW.print(nextIndex+":"+numChars+" ");
-							nextIndex++;
-						}
-						if(featureFlags[4]){
-							//unique words
-							featureW.print(nextIndex+":"+uniqueCount+" ");
-							nextIndex++;
-						}
-						if(featureFlags[5]){
 							//num capital letters
 							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 							nextIndex++;	
+						}
+						if(featureFlags[4]){
+							//length (characters)
+							featureW.print(nextIndex+":"+numChars+" ");
+							nextIndex++;
 						}
 						 featureW.print("\n");
 					}
