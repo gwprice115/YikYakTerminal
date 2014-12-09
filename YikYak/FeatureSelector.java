@@ -29,7 +29,7 @@ import java.util.Map.Entry;
 public class FeatureSelector {
 	protected static final String FEATURE_PREFIX = "dayOfWeek.";
 	double stopListParam = 0.01;
-	public static final String ALL_SCHOOLS = "all_schools.";
+	public static final String ALL_SCHOOLS = "all_schools";
 	protected  Map<String, HashMap<String, Integer>> bigrams;
 	protected  HashMap<String, Integer> unigrams = new HashMap<String, Integer>();
 	protected  Set<String> vocabulary;
@@ -235,12 +235,12 @@ public class FeatureSelector {
 			TreeMap<Integer,Integer> gramFeatureMap;
 			String featureFile;
 			if(train){
-				featureFile=fileExt+"_features_train";
+				featureFile=fileExt+".features_train";
 			}else{
-				featureFile = fileExt+"_features_test";
+				featureFile = fileExt+".features_test";
 			}
 			PrintWriter featureW = new PrintWriter(new FileWriter(featureFile+".txt")); //features of cases
-			PrintWriter labelW = new PrintWriter(new FileWriter(fileExt+"_labels_test.txt")); //labels of cases
+			PrintWriter labelW = new PrintWriter(new FileWriter(fileExt+".labels.txt")); //labels of cases
 			//get vocab & store yaks
 			Pattern headerPattern = Pattern.compile(".*###\\s(.*)\\s###"); //group(1)== header
 			Pattern likeLinePattern = Pattern.compile("\\s*(-?\\d+)\\slikes.*Posted\\s+([0123456789-]+)\\s+([0123456789:]+).*");
@@ -251,7 +251,6 @@ public class FeatureSelector {
 			Calendar calendar = Calendar.getInstance();
 			
 			for (String inputFile: inputFiles){
-				System.out.println(inputFile);
 				Matcher m = Pattern.compile("(.*)File.*").matcher(inputFile);
 				School school = null;
 				int hour = 0;
@@ -553,17 +552,17 @@ public class FeatureSelector {
 
 		 	List<String> inputFiles = new ArrayList<String>();
 		 	inputFiles.add(school+"File.train");
-		 	FeatureSelector trainData = new FeatureSelector(inputFiles, FEATURE_PREFIX+school, featureFlags);
+		 	FeatureSelector trainData = new FeatureSelector(inputFiles, school, featureFlags);
 			
 			
 		 	List<String> timeTestFiles = new ArrayList<String>();
 		 	timeTestFiles.add(school+"File.time");
-		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".time", featureFlags);
+		 	FeatureSelector timeData = new FeatureSelector(timeTestFiles, "dictionary.txt", school+".time", featureFlags);
 
 		 	List<String> randTestFiles = new ArrayList<String>();
 		 	randTestFiles.add(school+"File.rand");
 
-		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", FEATURE_PREFIX+school+".rand", featureFlags);
+		 	FeatureSelector randData = new FeatureSelector(randTestFiles, "dictionary.txt", school+".rand", featureFlags);
 		 }
 		
 		ArrayList<String> allSchoolsTrain = new ArrayList<String>();
@@ -576,7 +575,7 @@ public class FeatureSelector {
 		allSchoolsTrain.add("texasFile.train");
 		allSchoolsTrain.add("utahFile.train");
 		allSchoolsTrain.add("wakeFile.train");
-		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FEATURE_PREFIX+FeatureSelector.ALL_SCHOOLS, featureFlags);
+		FeatureSelector allSchools = new FeatureSelector(allSchoolsTrain, FeatureSelector.ALL_SCHOOLS, featureFlags);
 		
 		 ArrayList<String> timeAll = new ArrayList<String>();
 		 timeAll.add("claremontFile.time");
@@ -588,8 +587,7 @@ public class FeatureSelector {
 		 timeAll.add("texasFile.time");
 		 timeAll.add("utahFile.time");
 		 timeAll.add("wakeFile.time");
-		 System.out.println("all school time--------");
-		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.time", featureFlags);
+		 FeatureSelector allSchoolsTime = new FeatureSelector(timeAll, "dictionary.txt", "all_schools.time", featureFlags);
 		
 		 ArrayList<String> randAll = new ArrayList<String>();
 		 randAll.add("claremontFile.rand");
@@ -601,8 +599,7 @@ public class FeatureSelector {
 		 randAll.add("texasFile.rand");
 		 randAll.add("utahFile.rand");
 		 randAll.add("wakeFile.rand");
-		 System.out.println("all school rand--------");
-		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", FEATURE_PREFIX+"all_schools.rand", featureFlags);
+		 FeatureSelector allSchoolsRand = new FeatureSelector(randAll, "dictionary.txt", "all_schools.rand", featureFlags);
 
 		
 		
