@@ -5,7 +5,7 @@ public class MultiClassify {
 	
 	public static void main(String[] args) {
 		//unigrams, dayOfWeek, header?, length(words), length(chars), uniqueWords, numCapLetters
-		int numFeatures = 5;
+		int numFeatures = 4;
 		PrintWriter writer = null;
 		PrintWriter cwriter= null;
 		String subsetString;
@@ -17,7 +17,8 @@ public class MultiClassify {
 			cwriter.println();
 			writer.close();
 			cwriter.close();
-			for(int i = 13; i < Math.pow(2,numFeatures); i++) {
+			for(int i = 8; i < Math.pow(2,numFeatures); i*=2) {
+				System.out.println(""+i);
 				String[] subSet = new String[numFeatures];
 				for(int b = 0; b < numFeatures; b++) {
 					subSet[b] = "" + ((i >> b) & 1);
@@ -41,7 +42,7 @@ public class MultiClassify {
 				pr = rt.exec("python ../accuracy.py all_schools.rand.labels.txt all_schools.rand.output");
 				pr.waitFor();
 				writer = new PrintWriter(new FileWriter("allSchoolResults.txt", true));
-				System.out.println(""+i);
+
 				writer.println("features "+subsetString);
 				reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 				writer.print("rand: ");

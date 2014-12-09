@@ -434,11 +434,11 @@ public class FeatureSelector {
 							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 							nextIndex++;	
 						}
-						if(featureFlags[4]){
-							//length (characters)
-							featureW.print(nextIndex+":"+numChars+" ");
-							nextIndex++;
-						}
+						// if(featureFlags[4]){
+						// 	//length (characters)
+						// 	featureW.print(nextIndex+":"+numChars+" ");
+						// 	nextIndex++;
+						// }
 						 featureW.print("\n");
 					}
 					
