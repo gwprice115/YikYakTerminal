@@ -429,12 +429,12 @@ public class FeatureSelector {
 							featureW.print(nextIndex+":"+numChars+" ");
 							nextIndex++;
 						}
+						// if(featureFlags[4]){
+						// 	//unique words
+						// 	featureW.print(nextIndex+":"+uniqueCount+" ");
+						// 	nextIndex++;
+						// }
 						if(featureFlags[4]){
-							//unique words
-							featureW.print(nextIndex+":"+uniqueCount+" ");
-							nextIndex++;
-						}
-						if(featureFlags[5]){
 							//num capital letters
 							featureW.print(nextIndex+":"+numCapitalLetters(yakText)+" ");
 							nextIndex++;	
