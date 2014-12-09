@@ -407,23 +407,23 @@ public class FeatureSelector {
 							nextIndex+=7; //increment next index over all possible day indices
 						}
 
-						// if(featureFlags[2]){
-						// 	//posttime
-						// 	featureW.print(nextIndex+":"+postTime+" ");
-						// 	nextIndex++;
-						// }
 						if(featureFlags[2]){
+							//posttime
+							featureW.print(nextIndex+":"+postTime+" ");
+							nextIndex++;
+						}
+						if(featureFlags[3]){
 							//header?
 							if(header != null){
 								featureW.print(nextIndex+":1 ");
 							}
 							nextIndex++;
 						}
-						if(featureFlags[3]){
-							//length (words)
-							featureW.print(nextIndex+":"+numWords+" ");
-							nextIndex++;
-						}
+//						if(featureFlags[4]){
+//							//length (words)
+//							featureW.print(nextIndex+":"+numWords+" ");
+//							nextIndex++;
+//						}
 						if(featureFlags[4]){
 							//length (characters)
 							featureW.print(nextIndex+":"+numChars+" ");
