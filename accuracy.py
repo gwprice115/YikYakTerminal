@@ -11,6 +11,6 @@ with open(predPath) as predFile, open(dataPath) as dataFile:
         if (float(p)<0 and float(d)<0) or (float(p)>0 and float(d)>0):
         	correct=correct+1
         total = total+1
-
 print "correct", correct
 print "total", total
+print "accuracy:",float(correct)/total
