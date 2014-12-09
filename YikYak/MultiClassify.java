@@ -11,7 +11,7 @@ public class MultiClassify {
 			writer = new PrintWriter(new FileWriter("allSchoolResults.txt"));
 			cwriter = new PrintWriter(new FileWriter("claremontResults.txt"));
 			BufferedReader reader; //Math.pow(2,numFeatures)
-			for(int i = 0; i < Math.pow(2,numFeatures); i++) {
+			for(int i = 4; i < Math.pow(2,numFeatures-1); i*=2) {
 				System.out.println(""+i);
 				writer.print("features ");
 				cwriter.print("features ");
