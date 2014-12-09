@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 //keep a set of unique words
 
 public class FeatureSelector {
-	protected static final String FEATURE_PREFIX = "dayOfWeek.";
+	protected static final String FEATURE_PREFIX = "";
 	double stopListParam = 0.01;
 	public static final String ALL_SCHOOLS = "all_schools";
 	protected  Map<String, HashMap<String, Integer>> bigrams;
