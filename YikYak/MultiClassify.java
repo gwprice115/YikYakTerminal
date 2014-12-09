@@ -3,8 +3,8 @@ import java.io.*;
 public class MultiClassify {
 	
 	public static void main(String[] args) {
-		//unigrams, dayOfWeek, postTime, header?, length(words), length(chars), uniqueWords, numCapLetters
-		int numFeatures = 8;
+		//unigrams, dayOfWeek, header?, length(words), length(chars), uniqueWords, numCapLetters
+		int numFeatures = 7;
 		PrintWriter writer = null;
 		PrintWriter cwriter= null;
 		try {
