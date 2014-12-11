@@ -1,6 +1,9 @@
 Yik Yak Terminal
 ==============
 
+Contributed to by gwprice115, sjundt, and snl017. 
+Used for our final project in NLP, Fall 2014.
+
 Based on implementation of YikYak using the pyak API by joseph346.
 
 This project includes a script to obtain data from nine universities on YikYak, in the main folder called "YikYak.py."
