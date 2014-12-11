@@ -1,3 +1,6 @@
+#authors: sarah jundt, george price, shannon lubetich
+#gets the accuracy of test results 
+#args: paths for predicted_values, actual_values 
 import sys
 from itertools import izip
 

@@ -1,8 +1,5 @@
-
-
-# school_rand_labels_test 
-
-
+#gets the r-squared value of predicted values
+#author: george price
 #takes in (1) a prediction file and (2) an actualdata file
 
 import sys

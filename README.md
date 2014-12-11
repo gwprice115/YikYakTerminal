@@ -10,10 +10,10 @@ This project includes a script to obtain data from nine universities on YikYak, 
 
 We then used this script to obtain data over a multiweek period on an Amazon EC2 instance. That data can be found in the "data" folder.
 
-We converted this data into one line per Yak, then shuffled it to separate for training and testing purposes. These processed files can be found in the "data shuffled" folder.
+For two hours since posting, we converted this data into one line per Yak, then shuffled it to separate for training and testing purposes. These processed files can be found in the "data shuffled" folder.
 
 
-All out code for analysis can be found in the "Java_code."
+All our code for analysis can be found in the "Java_code."
 To analyze our data, we created a script to extract features, format them into input for SVMLight, and then run SVMLight for classification.
 
 SVMLight can be found at http://svmlight.joachims.org

@@ -1,4 +1,11 @@
 #! /usr/bin/env python3
+#Contributed to by gwprice115, sjundt, and snl017. 
+#Used for our final project in NLP, Fall 2014.
+#Based on implementation of YikYak using the pyak API by joseph346.
+
+#Pulls Yaks from nine schools 1,2,3,and 4 hours after their posting. Writes them to separate files based on 
+#school and time passed since posting. 
+
 import API as pk
 import pygeocoder
 import requests
@@ -11,7 +18,6 @@ def main():
 	
 	# Initialize Google Geocoder API
 	geocoder = pygeocoder.Geocoder("AIzaSyB3X2bU_oHFuiYUpcHog_jQhaR-zN-3cmE")
-
 	try:
 		# If user already has ID, read file
 		f = open("userID", "r")
@@ -33,11 +39,7 @@ def main():
 			
 		except:
 			pass
-
 	currentlist = []
-	
-	# When actions are completed, user can execute another action or quit the app
-
 	# Locations to query
 		# Columbia University
 		# Claremont Colleges
@@ -148,14 +150,6 @@ def read(yaklist,outFile, times):
 			comments = yak.get_comments()
 			# number of comments
 			outFile.write("\n\tComments: "+str(len(comments))+"\n")
-			
-			# # print all comments separated by dashes
-			# for comment in comments:
-			# 	outFile.write("\t   {0:>4}".format(commentNum), end=' ')
-			# 	print ("-" * 77)
-			# 	comment.print_comment()
-			# 	commentNum += 1
-				
 			yakNum += 1
 		
 main()
