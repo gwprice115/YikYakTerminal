@@ -5,15 +5,25 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.TreeMap;
 import java.util.Collections;
-
+/**
+ * Sort results of classification tests.
+ * Sort by accuracy on the random set and accuracy on the time set.
+ * @author sarah jundt, shannon lubetich, george price
+ *
+ */
 public class ResultSorter {
-
 	//SMALL_DOUBLE is used as a minimum-impact addition to keys in a TreeMap to overcome the unique-key constraint
 	private static final double SMALL_DOUBLE = 0.0000000000000001;
 	
+	/**
+	 * Sorts feature sets by accuracy on the random test set into the file randSorted....
+	 * Sorts feature sets by accuracy on the time test set into the file timeSorted....
+	 * Requires that files allSchoolResults.txt and claremontResults.txt exist & are in the format
+	 * outputted by MultiClassify.java's main method
+	 * @param args- none
+	 */
 	public static void main(String[] args) {
 		BufferedReader reader = null;
-		BufferedReader creader = null;
 		ArrayList<String> files = new ArrayList<String>();
 		files.add("allSchoolResults.txt");
 		files.add("claremontResults.txt");
@@ -66,11 +76,3 @@ public class ResultSorter {
 	}
 
 }
-
-
-// features 0,0,0,0,0,0,0,
-// rand: correct 643	total 2144	accuracy: 0.299906716418	
-// time: correct 653	total 2075	accuracy: 0.314698795181	
-// features 1,0,0,0,0,0,0,
-// rand: correct 1576	total 2144	accuracy: 0.735074626866	
-// time: correct 1475	total 2075	accuracy: 0.710843373494

@@ -20,20 +20,20 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.Map.Entry;
 
-// import features.Yak.School;
-
-//make a list of vocab words that we can iterate in an order
-//keep a set of unique words
-
+/**
+ * Gets the most important features from a feature vector.
+ * @author sarah jundt, shannon lubetich, george price
+ *
+ */
 public class BestWords {
 	protected Map<Integer, String> dictionaryMap;
-	int maxUnigrams;
+	int maxUnigrams; //maximum feature number for unigrams
 
 	/**
-	 * for testing
+	 * Sorts features by weight & prints the most important.
 	 * requires eternal dictionary file
-	 * @param testFiles
-	 * @param dictionaryFile
+	 * @param featureVector - features & weights
+	 * @param dictionaryFile- map: (feature: feature number) 
 	 */
 	public BestWords(String dictionaryFile, String featureVector){		
 		dictionaryMap = new HashMap<Integer,String>();
@@ -78,9 +78,14 @@ public class BestWords {
 		//next index starts at maxUnigrams+!
 	}
 
+	/**
+	 * Prints the 100 highest-weighted features (in the positive direction)
+	 * @param featureVector- features numbers & weights
+	 */
 	private void getBestWords(String featureVector){
 		try {
-			TreeMap<Float, Set<String>> weights = new TreeMap<Float, Set<String>>(Collections.reverseOrder());
+			//get absolute-value positive weighted features. remove Collections.reverseOrder() to get high absolute-value negative weights.
+			TreeMap<Float, Set<String>> weights = new TreeMap<Float, Set<String>>(Collections.reverseOrder()); 
 			BufferedReader reader = new BufferedReader(new FileReader(featureVector));
 			String wordEntry;
 			while((wordEntry=reader.readLine())!=null){
@@ -103,15 +108,15 @@ public class BestWords {
 				i++;
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
+	/**
+	 * Prints 100 best features for dictionary & feature vector passed in.
+	 * @param args - dictionary, feature file.
+	 */
 	public static void main(String[] args){
 		new BestWords(args[0], args[1]);
-		
-		
 	}
-
 }

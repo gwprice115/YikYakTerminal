@@ -1,23 +1,35 @@
 import java.io.*;
 import java.util.*;
 
+/**
+ * Runs through all possible combinations of unigrams, dayOfWeek, header? numCapLetters. 
+ * For each combination, get featureFiles, train a model for claremont and all_schools, and for each model,
+ * run time and rand testing sets. Output results in allSchoolResults.txt & claremontResults.txt.
+ * @author sarah jundt, shannon lubetich, george price
+ *
+ */
 public class MultiClassify {
 	
+	/**
+	 * get featureFiles, train a model for claremont and all_schools, and for each model,
+	 * run time and rand testing sets. Output results in results files.
+	 * @param args- none
+	 */
 	public static void main(String[] args) {
-		//unigrams, dayOfWeek, header?, length(words), length(chars), uniqueWords, numCapLetters
+		//unigrams, dayOfWeek, header?, numCapLetters
 		int numFeatures = 4;
 		PrintWriter writer = null;
 		PrintWriter cwriter= null;
 		String subsetString;
 		try {
-			BufferedReader reader; //Math.pow(2,numFeatures)
+			BufferedReader reader;
 			writer = new PrintWriter(new FileWriter("allSchoolResults.txt"));
 			cwriter = new PrintWriter(new FileWriter("claremontResults.txt"));
 			writer.println();
 			cwriter.println();
 			writer.close();
 			cwriter.close();
-			for(int i = 8; i < Math.pow(2,numFeatures); i*=2) {
+			for(int i = 0; i < Math.pow(2,numFeatures); i*=2) {
 				System.out.println(""+i);
 				String[] subSet = new String[numFeatures];
 				for(int b = 0; b < numFeatures; b++) {

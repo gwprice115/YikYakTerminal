@@ -1,4 +1,3 @@
-package features;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -19,11 +18,13 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import features.Yak.School;
-
-//make a list of vocab words that we can iterate in an order
-//keep a set of unique words
-
+/**
+ * Old Feature Selector, for regression. 
+ * NOTE: DEPRECATED. 
+ * NOT COMMENTED ACCURATELY.
+ * @author sarah jundt, george price, shannon lubetich
+ *
+ */
 public class FeatureSelector {
 	protected  Map<String, HashMap<String, Integer>> bigrams;
 	protected  Map<String, Integer> unigrams;
