@@ -1,4 +1,5 @@
-features: unigrams, day of week, header, capital letters, num chars
+## features: unigrams, day of week, header, capital letters, num chars (not used)
+## Sorted in order of highest to lowest accuracy on the time-based testing set for claremont
 
 features [1, 0, 1, 0, 0]
 rand: correct 194	total 299	accuracy: 0.648829431438	

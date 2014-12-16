@@ -1,4 +1,4 @@
-features: unigrams, day of week, header, capital letters, num chars
+features: unigrams, day of week, header, capital letters, num chars (never used)
 features [0, 0, 0, 0, 0]
 rand: correct 643	total 2144	accuracy: 0.299906716418	
 time: correct 653	total 2075	accuracy: 0.314698795181	

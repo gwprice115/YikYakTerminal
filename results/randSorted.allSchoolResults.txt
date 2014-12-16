@@ -1,4 +1,5 @@
-features: unigrams, day of week, header, capital letters, num chars
+## features: unigrams, day of week, header, capital letters, num chars
+## Sorted in order of highest to lowest accuracy on the random testing set for all schools
 
 features [1, 0, 1, 1, 0]
 rand: correct 1601	total 2144	accuracy: 0.746735074627	
